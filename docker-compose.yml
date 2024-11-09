@@ -1,0 +1,79 @@
+version: '3.9'
+services:
+  pidor:
+    image: backend:latest
+    restart: always
+    command: bash -c "alembic revision --autogenerate && alembic upgrade head && gunicorn pidor.app:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --log-level info"
+    depends_on:
+      - pg
+      - redis
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "8000:8000"      
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=${DB_HOST}
+      - SECRET_KEY_JWT=${SECRET_KEY_JWT}
+      - Broker_Host=${Broker_Host}
+      - Broker_Port=${Broker_Port}
+      - Broker_Password=${Broker_Password}
+
+  login:
+    image: backend:latest
+    restart: always
+    command: bash -c "gunicorn login.app:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --log-level info"
+    depends_on:
+      - pidor
+      - pg
+      - redis    
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "8080:8080"  
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_PORT=${DB_PORT}  
+      - DB_HOST=${DB_HOST}        
+      - OAUTHLIB_INSECURE_TRANSPORT=${OAUTHLIB_INSECURE_TRANSPORT}
+      - SECRET_KEY_JWT=${SECRET_KEY_JWT}
+      - Broker_Host=${Broker_Host}
+      - Broker_Port=${Broker_Port}
+      - Broker_Password=${Broker_Password}    
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - DOMAIN_COOKIE=${DOMAIN_COOKIE}
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}  
+      - REDIRECT_APP=${REDIRECT_APP}
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-static/dist/:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  pg:
+    image: postgres:latest
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_DATABASE}
+
+  redis:
+    image: redis/redis-stack-server
+    restart: always
+    ports:
+      - "${Broker_Port}:${Broker_Port}"
+    environment:
+      - REDIS_ARGS=--port ${Broker_Port} --requirepass ${Broker_Password} --appendonly yes
