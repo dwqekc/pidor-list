@@ -1,0 +1,90 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#user-list li {
+  list-style: none;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+#div_HEAD {
+  background-color: var(--bgcolor);
+  padding-top: 1.3rem;
+  padding-bottom: 3%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#a_HEAD{
+  text-decoration: none;
+  color:hotpink;
+}
+
+#h1_HEAD {
+  align-self: center;
+}
+
+#login-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 111px;
+  cursor: pointer;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.increase-score {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+#pagination {
+  display: flex;
+  justify-content: center;
+}
+#pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+}
+#pagination button.active {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+@media screen and (min-width: 300px) {
+  #div_HEAD {
+    padding-bottom: 8%;
+  }
+}
